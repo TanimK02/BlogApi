@@ -1,0 +1,12 @@
+Flask~=3.0.2
+Flask-JWT-Extended
+Flask-Smorest
+Flask-SQLAlchemy
+passlib~=1.7.4
+marshmallow~=3.20.2
+python-dotenv
+redis[hiredis]~=5.0.1
+psycopg2-binary
+alembic~=1.13.1
+flask-migrate
+flask-session
