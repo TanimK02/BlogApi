@@ -1,12 +1,14 @@
 from db import db
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, ForeignKey
 
 
 class CommentModel(db.Model):
     __tablename__ = "comments"
 
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    published_at = db.Column(db.String(), nullable=False)
-    updated_at = db.Column(db.String(), nullable=True)
-    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    content: Mapped[str] = mapped_column(nullable=False)
+    author_id = mapped_column(ForeignKey("users.id"))
+    published_at: Mapped[str] = mapped_column(nullable=False)
+    updated_at: Mapped[str] = mapped_column(nullable=True)
+    post_id = mapped_column(ForeignKey("posts.id"))

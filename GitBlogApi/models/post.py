@@ -1,16 +1,18 @@
 from db import db
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, ForeignKey
 
 
 class PostModel(db.Model):
     __tablename__ = "posts"
 
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
-    content = db.Column(db.String(), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    created_at = db.Column(db.String(), nullable=False)
-    updated_at = db.Column(db.String())
-    published_at = db.Column(db.String())
-    status = db.Column(db.String())
-    summary = db.Column(db.String())
-    comments = db.relationship('CommentModel', lazy='dynamic', cascade="all, delete")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(50), nullable=False)
+    content: Mapped[str] = mapped_column(nullable=False)
+    author_id = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[str] = mapped_column(nullable=False)
+    updated_at: Mapped[str] = mapped_column(nullable=True)
+    published_at: Mapped[str] = mapped_column(nullable=True)
+    status: Mapped[str] = mapped_column(nullable=True)
+    summary: Mapped[str] = mapped_column(nullable=True)
+    comments = relationship('CommentModel', lazy='dynamic', cascade="all, delete")
