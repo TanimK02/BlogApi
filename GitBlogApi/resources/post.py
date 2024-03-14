@@ -34,7 +34,7 @@ class MakePost(MethodView):
 class GetPost(MethodView):
     @blp.response(201, PostSchema)
     def get(self, post_id):
-        post = PostModel.query.get_or_404(post_id)
+        post = db.get_or_404(PostModel, post_id)
         if post.published_at or post.author_id == session["user_id"]:
             return post
         else:
@@ -47,7 +47,7 @@ class EditPost(MethodView):
     @blp.arguments(PostSchema)
     @blp.response(201, PostSchema)
     def put(self, post_data, admin_check=False):
-        post = PostModel.query.get_or_404(post_data["id"])
+        post = db.get_or_404(PostModel, post_data["id"])
         if "user_id" in session and session["user_id"] == post.author_id or admin_check:
             if post:
                 try:
@@ -70,7 +70,7 @@ class EditPost(MethodView):
 class PostDelete(MethodView):
     @login_and_authorization(session, "poster")
     def delete(self, post_id, admin_check=False):
-        post = PostModel.query.get_or_404(post_id)
+        post = db.get_or_404(PostModel, post_id)
         if "user_id" in session and session["user_id"] == post.author_id or admin_check:
             try:
                 db.session.delete(post)
@@ -88,7 +88,7 @@ class PostPublish(MethodView):
     @blp.arguments(PostSchema)
     @blp.response(201, PostSchema)
     def post(self, post_data, admin_check=False):
-        post = PostModel.query.get_or_404(post_data["id"])
+        post = db.get_or_404(PostModel, post_data["id"])
         if "user_id" in session and session["user_id"] == post.author_id or admin_check:
             if post:
                 try:
@@ -115,9 +115,12 @@ class PostList(MethodView):
     def get(self, page):
         page -= 1
         page = page * 10
-        return db.session.execute(
+        try: 
+            result = db.session.execute(
             db.select(PostModel).limit(10).offset(page).order_by(desc(PostModel.created_at))).scalars()
-
+        except SQLAlchemyError:
+            abort(400, message = "page not available")
+        return result
 
 @blp.route("/posts/<int:page>")
 class PostList(MethodView):
@@ -125,6 +128,10 @@ class PostList(MethodView):
     def get(self, page):
         page -= 1
         page = page * 10
-        return db.session.execute(db.select(PostModel).limit(10).offset(page). \
+        try:
+            result = db.session.execute(db.select(PostModel).limit(10).offset(page). \
                                   filter(PostModel.published_at.isnot(None)).order_by(desc(PostModel.created_at))). \
             scalars()
+        except SQLAlchemyError:
+            abort(400, message = "page not available")
+        return result

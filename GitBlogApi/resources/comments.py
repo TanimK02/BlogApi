@@ -39,8 +39,7 @@ class EditComment(MethodView):
     @blp.arguments(CommentSchema)
     @blp.response(201, CommentSchema)
     def put(self, comment_data, admin_check=False):
-        user_id = session.get("user_id")
-        comment = CommentModel.query.get_or_404(comment_data["id"])
+        comment = db.get_or_404(CommentModel, comment_data["id"])
         if "user_id" in session and session["user_id"] == comment.author_id or admin_check:
             if comment:
                 try:
@@ -61,7 +60,7 @@ class EditComment(MethodView):
 class CommentDelete(MethodView):
     @login_and_authorization(session)
     def delete(self, comment_id, admin_check=False):
-        comment = CommentModel.query.get_or_404(comment_id)
+        comment = db.get_or_404(CommentModel, comment_id)
         if "user_id" in session and session["user_id"] == comment.author_id or admin_check:
             try:
                 db.session.delete(comment)
@@ -80,6 +79,6 @@ class CommentLoad(MethodView):
     def get(self, post_id, rows):
         rows = rows - 1
         rows = rows * 10
-        comments = PostModel.query.get_or_404(post_id).comments.order_by(desc(CommentModel.published_at)).limit(10).\
+        comments = db.get_or_404(PostModel, post_id).comments.order_by(desc(CommentModel.published_at)).limit(10).\
             offset(rows)
         return comments.all()
