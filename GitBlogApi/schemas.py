@@ -25,7 +25,7 @@ class PostSchema(Schema):
     published_at = fields.Str()
     status = fields.Str()
     summary = fields.Str()
-    comments = fields.List(fields.Nested(PlainCommentSchema()), dump_only=True)
+    
 
 
 class CommentSchema(PlainCommentSchema):
